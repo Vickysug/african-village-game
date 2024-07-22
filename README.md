@@ -35,6 +35,7 @@ https://play.rosebud.ai/games/579d4adb-c409-4e38-8c87-007ba4cb8f84
 
 
 ## License
+
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
 ## Acknowledgements
