@@ -1,10 +1,10 @@
 class Example extends Phaser.Scene {
     constructor() {
         super();
-        this.mainGorilla = null;
-        this.gorillaFrame = null;
+        this.maintourist = null;
+        this.touristFrame = null;
         this.cursors = null;
-        this.defaultSpeed = 0.65; // Increased gorilla speed by 30%
+        this.defaultSpeed = 0.65; // Increased tourist speed by 30%
         this.defaultScale = 0.15 * (2 / 3) * 2;
         this.maxScale = this.defaultScale * 2.5;
         this.minScale = this.defaultScale * (1 / 2.5);
@@ -12,25 +12,25 @@ class Example extends Phaser.Scene {
         this.flashTimer = null;
         this.flashCircle = null;
         this.shouldFlash = false;
-        this.poachers = [];
-        this.poacherFrames = [];
+        this.elephants = [];
+        this.elephantFrames = [];
         this.flashRadius = 0;
-        this.poachersZapped = 0;
+        this.elephantsZapped = 0;
         this.scoreText = null;
         this.healthText = null;
         this.instructionText = null;
         this.controlsText = null;
         this.health = 200;
         this.gameOver = false;
-        this.poacherSpeed = 0.65; // Increased poacher speed by 30%
+        this.elephantspeed = 0.65; // Increased elephant speed by 30%
         this.worldSize = null;
         this.scaleRate = 0.00625;
     }
 
     preload() {
-        this.load.image('gorilla', 'https://play.rosebud.ai/assets/tourist.png?5H72');
+        this.load.image('tourist', 'https://play.rosebud.ai/assets/tourist.png?5H72');
         this.load.image('background', 'https://play.rosebud.ai/assets/create a cartoon style bustling African village map.png?n46i');
-        this.load.image('poacher', 'https://play.rosebud.ai/assets/elephant.png?T2vz');
+        this.load.image('elephant', 'https://play.rosebud.ai/assets/elephant.png?T2vz');
     }
 
     create() {
@@ -43,11 +43,11 @@ class Example extends Phaser.Scene {
 
         this.add.image(this.worldSize.width / 2, this.worldSize.height / 2, 'background').setDisplaySize(this.worldSize.width, this.worldSize.height); // Resized the background
 
-        this.mainGorilla = this._addGorilla(this.worldSize.width / 2, this.worldSize.height / 2);
-        const mainGorillaFrameColor = 0x0000FF;
-        this.gorillaFrame = this.add.graphics({
+        this.maintourist = this._addtourist(this.worldSize.width / 2, this.worldSize.height / 2);
+        const maintouristFrameColor = 0x0000FF;
+        this.touristFrame = this.add.graphics({
             fillStyle: {
-                color: mainGorillaFrameColor
+                color: maintouristFrameColor
             }
         });
 
@@ -55,7 +55,7 @@ class Example extends Phaser.Scene {
         const safeDistance = screenLength;
 
         for (let i = 0; i < 7; i++) {
-            this._spawnPoacher(safeDistance);
+            this._spawnelephant(safeDistance);
         }
 
         this.flashCircle = this.add.graphics();
@@ -63,7 +63,7 @@ class Example extends Phaser.Scene {
         this.flashCircle.visible = false;
 
         this.cameras.main.setBounds(0, 0, this.worldSize.width, this.worldSize.height);
-        this.cameras.main.startFollow(this.mainGorilla, true);
+        this.cameras.main.startFollow(this.maintourist, true);
         this.cameras.main.setZoom(1);
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -108,10 +108,10 @@ class Example extends Phaser.Scene {
 
     update() {
         if (this.gameOver) return;
-        let speed = this.defaultSpeed / this.mainGorilla.scaleX;
+        let speed = this.defaultSpeed / this.maintourist.scaleX;
         let scaleRate = this.scaleRate;
 
-        this._updateGorilla(this.mainGorilla, speed, scaleRate, this.gorillaFrame);
+        this._updatetourist(this.maintourist, speed, scaleRate, this.touristFrame);
 
         this.updateFlashTimer();
 
@@ -119,22 +119,22 @@ class Example extends Phaser.Scene {
             this.flashCircle.clear();
             if (this.shouldFlash) {
                 this.flashCircle.fillStyle(0x00FF00, 0.5);
-                this.flashRadius = this.mainGorilla.displayWidth * 1.15;
-                this.flashCircle.fillCircle(this.mainGorilla.x, this.mainGorilla.y, this.flashRadius);
-                this._checkPoachersOverlap(this.worldSize);
+                this.flashRadius = this.maintourist.displayWidth * 1.15;
+                this.flashCircle.fillCircle(this.maintourist.x, this.maintourist.y, this.flashRadius);
+                this._checkelephantsOverlap(this.worldSize);
             }
             this.flashCircle.visible = this.shouldFlash;
         }
 
-        for (let i = 0; i < this.poachers.length; i++) {
-            const poacher = this.poachers[i];
-            const poacherFrame = this.poacherFrames[i];
-            poacherFrame.clear();
-            poacherFrame.lineStyle(2, 0xFF0000);
-            poacherFrame.strokeRect(poacher.x - poacher.displayWidth / 2, poacher.y - poacher.displayHeight / 2, poacher.displayWidth, poacher.displayHeight);
+        for (let i = 0; i < this.elephants.length; i++) {
+            const elephant = this.elephants[i];
+            const elephantFrame = this.elephantFrames[i];
+            elephantFrame.clear();
+            elephantFrame.lineStyle(2, 0xFF0000);
+            elephantFrame.strokeRect(elephant.x - elephant.displayWidth / 2, elephant.y - elephant.displayHeight / 2, elephant.displayWidth, elephant.displayHeight);
 
-            this._movePoacher(poacher);
-            this._checkPoacherTouchingGorilla(poacher);
+            this._moveelephant(elephant);
+            this._checkelephantTouchingtourist(elephant);
         }
 
         const cameraBottomY = this.cameras.main.scrollY + this.cameras.main.height;
@@ -147,53 +147,53 @@ class Example extends Phaser.Scene {
         this.healthText.setPosition(cameraMiddleX, cameraBottomY - 32);
         this.healthText.setText('Health: ' + this.health);
         this.scoreText.setPosition(cameraMiddleX, cameraBottomY);
-        this.scoreText.setText('LEVEL / SCORE: ' + this.poachersZapped);
+        this.scoreText.setText('LEVEL / SCORE: ' + this.elephantsZapped);
         if (this.health <= 0 && !this.gameOver) {
             this.gameOver = true;
             this.endGame();
         }
     }
 
-    _addGorilla(x, y) {
-        let gorilla = this.matter.add.image(x, y, 'gorilla');
-        gorilla.setDisplaySize(this.cameras.main.width * this.defaultScale, this.cameras.main.height * this.defaultScale);
-        gorilla.setIgnoreGravity(true);
-        gorilla.setScale(this.defaultScale);
-        return gorilla;
+    _addtourist(x, y) {
+        let tourist = this.matter.add.image(x, y, 'tourist');
+        tourist.setDisplaySize(this.cameras.main.width * this.defaultScale, this.cameras.main.height * this.defaultScale);
+        tourist.setIgnoreGravity(true);
+        tourist.setScale(this.defaultScale);
+        return tourist;
     }
 
-    _addPoacher(x, y) {
-        let poacher = this.matter.add.image(x, y, 'poacher');
-        poacher.setDisplaySize(this.cameras.main.width * (this.defaultScale / 1.52), this.cameras.main.height * (this.defaultScale / 1.52));
-        poacher.setIgnoreGravity(true);
-        poacher.setScale(this.defaultScale / 1);
-        return poacher;
+    _addelephant(x, y) {
+        let elephant = this.matter.add.image(x, y, 'elephant');
+        elephant.setDisplaySize(this.cameras.main.width * (this.defaultScale / 1.52), this.cameras.main.height * (this.defaultScale / 1.52));
+        elephant.setIgnoreGravity(true);
+        elephant.setScale(this.defaultScale / 1);
+        return elephant;
     }
 
-    _updateGorilla(gorilla, speed, scaleRate, frame) {
+    _updatetourist(tourist, speed, scaleRate, frame) {
         if (this.cursors.left.isDown) {
-            gorilla.x -= speed;
+            tourist.x -= speed;
         } else if (this.cursors.right.isDown) {
-            gorilla.x += speed;
+            tourist.x += speed;
         }
 
         if (this.cursors.up.isDown) {
-            gorilla.y -= speed;
+            tourist.y -= speed;
         } else if (this.cursors.down.isDown) {
-            gorilla.y += speed;
+            tourist.y += speed;
         }
 
-        if (this.shiftKey.isDown && gorilla.scaleX < this.maxScale) {
-            gorilla.setScale(gorilla.scaleX + scaleRate);
+        if (this.shiftKey.isDown && tourist.scaleX < this.maxScale) {
+            tourist.setScale(tourist.scaleX + scaleRate);
         }
 
-        if (this.ctrlKey.isDown && gorilla.scaleX > this.minScale) {
-            gorilla.setScale(gorilla.scaleX - scaleRate);
+        if (this.ctrlKey.isDown && tourist.scaleX > this.minScale) {
+            tourist.setScale(tourist.scaleX - scaleRate);
         }
 
         frame.clear();
         frame.lineStyle(5, frame.defaultFillColor);
-        frame.strokeRect(gorilla.x - gorilla.displayWidth / 2, gorilla.y - gorilla.displayHeight / 2, gorilla.displayWidth, gorilla.displayHeight);
+        frame.strokeRect(tourist.x - tourist.displayWidth / 2, tourist.y - tourist.displayHeight / 2, tourist.displayWidth, tourist.displayHeight);
     }
 
     _isWithinSafeDistance(x, y, centerX, centerY, safeDistance) {
@@ -201,89 +201,89 @@ class Example extends Phaser.Scene {
         return distanceFromCenter < safeDistance;
     }
 
-    _checkPoachersOverlap(worldSize) {
-        const flashCircleX = this.mainGorilla.x;
-        const flashCircleY = this.mainGorilla.y;
+    _checkelephantsOverlap(worldSize) {
+        const flashCircleX = this.maintourist.x;
+        const flashCircleY = this.maintourist.y;
         const flashCircleRadius = this.flashRadius;
         const safeDistance = Math.max(this.cameras.main.width, this.cameras.main.height);
 
-        for (let i = 0; i < this.poachers.length; i++) {
-            const poacher = this.poachers[i];
-            const poacherRect = new Phaser.Geom.Rectangle(poacher.x - poacher.displayWidth / 2, poacher.y - poacher.displayHeight / 2, poacher.displayWidth, poacher.displayHeight);
+        for (let i = 0; i < this.elephants.length; i++) {
+            const elephant = this.elephants[i];
+            const elephantRect = new Phaser.Geom.Rectangle(elephant.x - elephant.displayWidth / 2, elephant.y - elephant.displayHeight / 2, elephant.displayWidth, elephant.displayHeight);
 
-            if (Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(flashCircleX, flashCircleY, flashCircleRadius), poacherRect)) {
-                this._respawnPoacher(worldSize, safeDistance, i);
-                this.poachersZapped++;
-                this.poacherSpeed += 0.05;
+            if (Phaser.Geom.Intersects.CircleToRectangle(new Phaser.Geom.Circle(flashCircleX, flashCircleY, flashCircleRadius), elephantRect)) {
+                this._respawnelephant(worldSize, safeDistance, i);
+                this.elephantsZapped++;
+                this.elephantspeed += 0.05;
             }
         }
     }
 
-    _checkPoacherTouchingGorilla(poacher) {
-        const gorillaRect = new Phaser.Geom.Rectangle(
-            this.mainGorilla.x - this.mainGorilla.displayWidth / 2,
-            this.mainGorilla.y - this.mainGorilla.displayHeight / 2,
-            this.mainGorilla.displayWidth,
-            this.mainGorilla.displayHeight
+    _checkelephantTouchingtourist(elephant) {
+        const touristRect = new Phaser.Geom.Rectangle(
+            this.maintourist.x - this.maintourist.displayWidth / 2,
+            this.maintourist.y - this.maintourist.displayHeight / 2,
+            this.maintourist.displayWidth,
+            this.maintourist.displayHeight
         );
-        const poacherRect = new Phaser.Geom.Rectangle(
-            poacher.x - poacher.displayWidth / 2,
-            poacher.y - poacher.displayHeight / 2,
-            poacher.displayWidth,
-            poacher.displayHeight
+        const elephantRect = new Phaser.Geom.Rectangle(
+            elephant.x - elephant.displayWidth / 2,
+            elephant.y - elephant.displayHeight / 2,
+            elephant.displayWidth,
+            elephant.displayHeight
         );
-        if (Phaser.Geom.Intersects.RectangleToRectangle(gorillaRect, poacherRect)) {
+        if (Phaser.Geom.Intersects.RectangleToRectangle(touristRect, elephantRect)) {
             this.health--;
         }
     }
 
-    _movePoacher(poacher) {
-        const distanceToGorilla = Phaser.Math.Distance.Between(poacher.x, poacher.y, this.mainGorilla.x, this.mainGorilla.y);
-        const angleToGorilla = Phaser.Math.Angle.Between(poacher.x, poacher.y, this.mainGorilla.x, this.mainGorilla.y);
+    _moveelephant(elephant) {
+        const distanceTotourist = Phaser.Math.Distance.Between(elephant.x, elephant.y, this.maintourist.x, this.maintourist.y);
+        const angleTotourist = Phaser.Math.Angle.Between(elephant.x, elephant.y, this.maintourist.x, this.maintourist.y);
 
-        const velocityX = Math.cos(angleToGorilla) * this.poacherSpeed;
-        const velocityY = Math.sin(angleToGorilla) * this.poacherSpeed;
+        const velocityX = Math.cos(angleTotourist) * this.elephantspeed;
+        const velocityY = Math.sin(angleTotourist) * this.elephantspeed;
 
-        poacher.x += velocityX;
-        poacher.y += velocityY;
+        elephant.x += velocityX;
+        elephant.y += velocityY;
     }
 
-    _spawnPoacher(safeDistance) {
+    _spawnelephant(safeDistance) {
         let x, y;
         do {
             x = Phaser.Math.RND.between(this.worldSize.width * 0.1, this.worldSize.width * 0.9);
             y = Phaser.Math.RND.between(this.worldSize.height * 0.1, this.worldSize.height * 0.9);
-        } while (this._isWithinSafeDistance(x, y, this.mainGorilla.x, this.mainGorilla.y, safeDistance));
+        } while (this._isWithinSafeDistance(x, y, this.maintourist.x, this.maintourist.y, safeDistance));
 
-        let poacher = this._addPoacher(x, y);
-        this.poachers.push(poacher);
+        let elephant = this._addelephant(x, y);
+        this.elephants.push(elephant);
 
-        let poacherFrame = this.add.graphics();
-        poacherFrame.lineStyle(2, 0xFF0000);
-        poacherFrame.strokeRect(poacher.x - poacher.displayWidth / 2, poacher.y - poacher.displayHeight / 2, poacher.displayWidth, poacher.displayHeight);
-        this.poacherFrames.push(poacherFrame);
+        let elephantFrame = this.add.graphics();
+        elephantFrame.lineStyle(2, 0xFF0000);
+        elephantFrame.strokeRect(elephant.x - elephant.displayWidth / 2, elephant.y - elephant.displayHeight / 2, elephant.displayWidth, elephant.displayHeight);
+        this.elephantFrames.push(elephantFrame);
     }
 
-    _respawnPoacher(worldSize, safeDistance, index) {
-        const poacher = this.poachers[index];
-        const poacherFrame = this.poacherFrames[index];
+    _respawnelephant(worldSize, safeDistance, index) {
+        const elephant = this.elephants[index];
+        const elephantFrame = this.elephantFrames[index];
 
-        poacher.destroy();
-        poacherFrame.destroy();
-        this.poachers.splice(index, 1);
-        this.poacherFrames.splice(index, 1);
+        elephant.destroy();
+        elephantFrame.destroy();
+        this.elephants.splice(index, 1);
+        this.elephantFrames.splice(index, 1);
 
-        this._spawnPoacher(safeDistance);
+        this._spawnelephant(safeDistance);
     }
 
-    calculateFlashInterval(gorilla) {
+    calculateFlashInterval(tourist) {
         const flashInterval = this.baseFlashInterval;
         return flashInterval;
     }
 
     startFlashTimer() {
         this.flashTimer = this.time.addEvent({
-            delay: this.calculateFlashInterval(this.mainGorilla),
+            delay: this.calculateFlashInterval(this.maintourist),
             callback: () => {
                 this.shouldFlash = true;
 
@@ -297,7 +297,7 @@ class Example extends Phaser.Scene {
     }
 
     updateFlashTimer() {
-        this.flashTimer.delay = this.calculateFlashInterval(this.mainGorilla);
+        this.flashTimer.delay = this.calculateFlashInterval(this.maintourist);
     }
     endGame() {
         this.gameOver = true;
@@ -306,7 +306,7 @@ class Example extends Phaser.Scene {
         dimScreen.fillStyle(0x000000, 0.75);
         dimScreen.fillRect(this.cameras.main.scrollX, this.cameras.main.scrollY, this.cameras.main.width, this.cameras.main.height);
         // Display final score
-        const finalScoreText = this.add.text(this.cameras.main.scrollX + this.cameras.main.width / 2, this.cameras.main.scrollY + this.cameras.main.height / 2 - 50, `Final Score: ${this.poachersZapped}`, {
+        const finalScoreText = this.add.text(this.cameras.main.scrollX + this.cameras.main.width / 2, this.cameras.main.scrollY + this.cameras.main.height / 2 - 50, `Final Score: ${this.elephantsZapped}`, {
             fontSize: '65px',
             fill: '#fff'
         });
